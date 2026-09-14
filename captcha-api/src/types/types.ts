@@ -1,8 +1,7 @@
 
 export type ImageItem = {
     id: string;
-    label: string;
-    isCorrect: boolean;
+    path: string;
 }
 
 export enum Status {
@@ -30,7 +29,7 @@ export type CaptchaChallenge = {
     id: string;
     type: ChallengeType;
     status: Status;
-    images: string[];
+    images: ImageItem[];
     answerHash: string;
     completedAt: string | null;
 }

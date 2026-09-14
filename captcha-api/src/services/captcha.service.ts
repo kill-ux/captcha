@@ -81,17 +81,22 @@ export async function loadMathImage(): Promise<{ name: string; answer: number }>
 }
 
 
-async function generateMathChallenge(): Promise<{ image: string; answerHash: string; }> {
+async function generateMathChallenge(): Promise<{ name: string; answerHash: string; }> {
     const { name, answer } = await loadMathImage()
     const answerHash = crypto.createHash("sha256").update(answer.toString()).digest("hex")
     console.log("Math images loaded:", name, answer, answerHash)
-    return { image: name, answerHash }
+    return { name, answerHash }
 }
 
 async function createChallenge(session: CaptchaSession): Promise<CaptchaChallenge> {
     switch (session.currentStage) {
         case 1:
-            const { image, answerHash } = await generateMathChallenge()
+            const { name, answerHash } = await generateMathChallenge()
+
+            let image: ImageItem = {
+                id: crypto.randomUUID(),
+                path: name
+            }
 
             let challenge: CaptchaChallenge = {
                 id: crypto.randomUUID(),

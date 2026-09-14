@@ -34,8 +34,42 @@ app.get("/captcha", async (request) => {
         id: challenge?.id,
         type: challenge?.type,
         status: challenge?.status,
-        images: challenge?.images,
+        images: challenge?.images.map((image) => image.id),
         completedAt: challenge?.completedAt
+    }
+})
+
+app.get("/captcha/images/:image_id", async (request) => {
+    const { image_id } = request.params as { image_id?: string }
+    const cookieHeader = request.headers.cookie as string | undefined
+    const session = await getSessionFromCookie(cookieHeader)
+    if (!session) {
+        return {
+            status: "error",
+            message: "Missing session"
+        }
+    }
+
+    const challenge = await getCurrentStage(session)
+    if (!challenge) {
+        return {
+            status: "error",
+            message: "No active challenge"
+        }
+    }
+
+    const image = challenge?.images?.find(item  => item.id === image_id)
+
+    if (!image) {
+        return {
+            status: "error",
+            message: "Image not found"
+        }
+    }
+
+    console.log("Requested image:", image_id, image)
+    return {
+        image
     }
 })
 
