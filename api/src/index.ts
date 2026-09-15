@@ -1,5 +1,6 @@
 import Fastify from "fastify"
 import fastifyStatic from "@fastify/static"
+import cors from "@fastify/cors"
 import path from "path"
 import { registerSessionPlugin } from "./plugins/session.plugin"
 import { healthRoutes } from "./routes/health.routes"
@@ -7,6 +8,13 @@ import { sessionRoutes } from "./routes/session.routes"
 import { captchaRoutes } from "./routes/captcha.routes"
 
 const app = Fastify({ logger: true })
+
+app.register(cors, {
+    origin: "http://localhost:4200",
+    credentials: true,
+    methods: "*",
+    allowedHeaders: "*"
+})
 
 app.register(fastifyStatic, {
     root: path.join(import.meta.dirname, "..", "res")
