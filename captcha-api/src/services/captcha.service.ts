@@ -1,34 +1,24 @@
-import { CaptchaSessionRepository } from "../repositories/session.reposotory";
-import type { CaptchaChallenge, CaptchaSession } from "../types/types"
-import { dirname, join, extname, basename } from "path"
-import { fileURLToPath, redis } from "bun";
-import { readdir } from "fs/promises"
-
-import { ChallengeType, Status, type ImageItem } from "../types/types"
 import crypto from "crypto"
+import { CaptchaSessionRepository } from "../repositories/session.repository"
+import type { CaptchaChallenge, CaptchaSession } from "../types/types"
+import { Status } from "../types/types"
+import { getChallengeTypeForStage, getGenerator } from "../challenges/registry"
 
+const repository = new CaptchaSessionRepository()
 
-
-const repository = new CaptchaSessionRepository();
-
-export const getSessionFromCookie = async (cookieHeader: string | undefined): Promise<CaptchaSession | null> => {
-    const cookieSessionId = cookieHeader
+export async function getSessionFromCookie(cookieHeader: string | undefined): Promise<CaptchaSession | null> {
+    const sessionId = cookieHeader
         ?.split(";")
-        .map((cookie) => cookie.trim())
-        .find((cookie) => cookie.startsWith("sessionId="))
-        ?.replace("sessionId=", "")
+        .map((c) => c.trim())
+        .find((c) => c.startsWith("sessionId="))
+        ?.slice("sessionId=".length)
 
-    if (cookieSessionId) {
-        const session = await repository.findById(cookieSessionId)
-        if (session) {
-            await repository.refresh(cookieSessionId)
-            return session
-        }
-    }
+    if (!sessionId) return null
 
-    return  null
+    const session = await repository.findById(sessionId)
+    if (session) await repository.refresh(sessionId)
+    return session
 }
-
 
 export async function createSession(): Promise<CaptchaSession> {
     const now = new Date().toISOString()
@@ -41,121 +31,59 @@ export async function createSession(): Promise<CaptchaSession> {
         startedAt: now,
         updatedAt: now
     }
-
-    repository.save(session)
-
+    await repository.save(session)
     return session
-
 }
 
+async function createChallengeForCurrentStage(session: CaptchaSession): Promise<CaptchaChallenge> {
+    const type = getChallengeTypeForStage(session.currentStage)
+    const generator = getGenerator(type)
+    const { images, answerHash } = await generator.generate()
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const MATH_DIR = join(__dirname, "../..", "res", "math")
-console.log(MATH_DIR)
-
-export async function loadMathImage(): Promise<{ name: string; answer: number }> {
-    const names: string[] = (await readdir(MATH_DIR, { withFileTypes: true }))
-        .filter((f) => f.isFile() && extname(f.name).toLowerCase() === ".png")
-        .map((f) => f.name)
-
-    const mathImages = names.flatMap((name) => {
-        const stem = basename(name, ".png")
-        const match = stem.match(/^(\d+)\+(\d+)$/)
-        if (!match) return []
-        const [, a, b] = match
-        if (!a || !b) return []
-        const answer = parseInt(a, 10) + parseInt(b, 10)
-        return [{ name: join("math", name), answer }]
-    })
-
-    if (mathImages.length === 0) {
-        throw new Error(`No usable math images found in ${MATH_DIR}`)
+    const challenge: CaptchaChallenge = {
+        id: crypto.randomUUID(),
+        type,
+        status: Status.Active,
+        images,
+        answerHash,
+        completedAt: null
     }
 
-    // length > 0 guarantees this is defined; index safely anyway
-    const pick = mathImages[Math.floor(Math.random() * mathImages.length)]
-    if (!pick) {
-        throw new Error("Unreachable: empty mathImages after length check")
-    }
-    return pick
+    session.challenges.push(challenge)
+    await repository.save(session)
+    return challenge
 }
 
-
-async function generateMathChallenge(): Promise<{ name: string; answerHash: string; }> {
-    const { name, answer } = await loadMathImage()
-    const answerHash = crypto.createHash("sha256").update(answer.toString()).digest("hex")
-    console.log("Math images loaded:", name, answer, answerHash)
-    return { name, answerHash }
+export async function getCurrentChallenge(session: CaptchaSession): Promise<CaptchaChallenge | null> {
+    const active = session.challenges.find((c) => c.status === Status.Active)
+    if (active) return active
+    if (session.currentStage > session.totalStages) return null
+    return createChallengeForCurrentStage(session)
 }
 
-async function createChallenge(session: CaptchaSession): Promise<CaptchaChallenge> {
-    switch (session.currentStage) {
-        case 1:
-            const { name, answerHash } = await generateMathChallenge()
+export type VerifyResult =
+    | { ok: true; correct: true; completed: boolean; nextStage: number | null }
+    | { ok: true; correct: false }
+    | { ok: false; reason: "not-found" }
 
-            let image: ImageItem = {
-                id: crypto.randomUUID(),
-                path: name
-            }
+export async function verifyChallenge(
+    session: CaptchaSession,
+    challengeId: string,
+    answer: string
+): Promise<VerifyResult> {
+    const challenge = session.challenges.find((c) => c.id === challengeId && c.status === Status.Active)
+    if (!challenge) return { ok: false, reason: "not-found" }
 
-            let challenge: CaptchaChallenge = {
-                id: crypto.randomUUID(),
-                type: ChallengeType.Math,
-                status: Status.Active,
-                images: [image],
-                answerHash: answerHash,
-                completedAt: null
-            }
+    const correct = getGenerator(challenge.type).verify(answer, challenge)
+    if (!correct) return { ok: true, correct: false }
 
-            session.challenges.push(challenge)
-            repository.save(session)
-            
-            return challenge
-        // case 2:
-        //     return {
-        //         id: crypto.randomUUID(),
-        //         type: "math",
-        //         status: "active",
-        //         data: {
-        //             question: "What is 5 * 3?",
-        //             images: []
-        //         },
-        //         answerHash: crypto.createHash("sha256").update("15").digest("hex"),
-        //         completedAt: null
-        //     }
-        // case 3:
-        //     return {
-        //         id: crypto.randomUUID(),
-        //         type: "image-selection",
-        //         status: "active",
-        //         data: {
-        //             question: "Select all images with a cat.",
-        //             images: [
-        //                 { id: crypto.randomUUID(), label: "cat", isCorrect: true },
-        //                 { id: crypto.randomUUID(), label: "dog", isCorrect: false },
-        //                 { id: crypto.randomUUID(), label: "cat", isCorrect: true },
-        //                 { id: crypto.randomUUID(), label: "bird", isCorrect: false }
-        //             ]
-        //         },
-        //         answerHash: crypto.createHash("sha256").update("cat,cat").digest("hex"),
-        //         completedAt: null
-        //     }
-        default:
-            throw new Error("Invalid stage")
-    }
-}
+    challenge.status = Status.Completed
+    challenge.completedAt = new Date().toISOString()
+    session.score += 1
+    session.currentStage += 1
+    session.updatedAt = new Date().toISOString()
+    await repository.save(session)
 
-
-export async function getCurrentStage(session: CaptchaSession): Promise<CaptchaChallenge | null> {
-    const currentChallenge = session.challenges.find(challenge => challenge.status === Status.Active)
-    if (currentChallenge) {
-        return currentChallenge
-    } else {
-        if (session.currentStage <= session.totalStages) {
-            const newChallenge = await createChallenge(session)
-            return newChallenge
-        } else {
-            return null
-        }
-    }
+    const completed = session.currentStage > session.totalStages
+    return { ok: true, correct: true, completed, nextStage: completed ? null : session.currentStage }
 }
