@@ -10,20 +10,20 @@ export class CaptchaApi {
   constructor(private http: HttpClient) { }
 
   startSession(): Observable<any> {
-    return this.http.post('/captcha/sessions', {}, { withCredentials: true });
+    return this.http.post('/api/captcha/sessions', {}, { withCredentials: true });
   }
 
   getCurrentChallenge(): Observable<ChallengeResponse> {
-    return this.http.get<ChallengeResponse>('/captcha', { withCredentials: true });
+    return this.http.get<ChallengeResponse>('/api/captcha', { withCredentials: true });
   }
 
   getImageUrl(imageId: string): string {
-    return `/captcha/images/${imageId}`;
+    return `/api/captcha/images/${imageId}`;
   }
 
   verifyAnswer(challengeId: string, answer: string): Observable<VerifyResponse> {
     return this.http.post<VerifyResponse>(
-      '/captcha/verify',
+      '/api/captcha/verify',
       { challengeId, answer },
       { withCredentials: true }
     );

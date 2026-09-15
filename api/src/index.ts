@@ -13,7 +13,7 @@ app.register(cors, {
     origin: "http://localhost:4200",
     credentials: true,
     methods: "*",
-    allowedHeaders: "*"
+    allowedHeaders: ["Content-Type"]
 })
 
 app.register(fastifyStatic, {
@@ -22,9 +22,9 @@ app.register(fastifyStatic, {
 
 registerSessionPlugin(app)
 
-app.register(healthRoutes)
-app.register(sessionRoutes)
-app.register(captchaRoutes)
+app.register(healthRoutes, { prefix: '/api' })
+app.register(sessionRoutes, { prefix: '/api' })
+app.register(captchaRoutes, { prefix: '/api' })
 
 await app.listen({ port: 3000, host: "0.0.0.0" })
 
