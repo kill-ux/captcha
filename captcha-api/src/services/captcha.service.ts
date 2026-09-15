@@ -65,7 +65,7 @@ export async function loadMathImage(): Promise<{ name: string; answer: number }>
         const [, a, b] = match
         if (!a || !b) return []
         const answer = parseInt(a, 10) + parseInt(b, 10)
-        return [{ name: join(MATH_DIR, name), answer }]
+        return [{ name: join("math", name), answer }]
     })
 
     if (mathImages.length === 0) {

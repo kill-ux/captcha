@@ -1,15 +1,17 @@
 import Fastify from "fastify"
-import { ChallengeType, Status, type CaptchaChallenge, type CaptchaSession, type ImageItem } from "./types/types"
-import crypto from "crypto"
-import { CaptchaSessionRepository } from "./repositories/session.reposotory"
+import { access } from "fs/promises"
 import { createSession, getCurrentStage, getSessionFromCookie } from "./services/captcha.service";
-import { dirname, join, extname, basename } from "path"
-import { fileURLToPath, redis } from "bun";
-import { readdir } from "fs/promises"
+import fastifyStatic from "@fastify/static"
+import path from "path";
 
 
 
 const app = Fastify({ logger: true })
+
+console.log(import.meta.dirname)
+app.register(fastifyStatic, {
+    root: path.join(import.meta.dirname, "..", "res")
+})
 
 app.get("/health", async () => {
     return {
@@ -39,48 +41,47 @@ app.get("/captcha", async (request) => {
     }
 })
 
-app.get("/captcha/images/:image_id", async (request) => {
+app.get("/captcha/images/:image_id", async (request, reply) => {
     const { image_id } = request.params as { image_id?: string }
     const cookieHeader = request.headers.cookie as string | undefined
     const session = await getSessionFromCookie(cookieHeader)
+
     if (!session) {
-        return {
+        return reply.code(401).send({
             status: "error",
-            message: "Missing session"
-        }
+            message: "Missing session",
+        })
     }
 
     const challenge = await getCurrentStage(session)
     if (!challenge) {
-        return {
+        return reply.code(404).send({
             status: "error",
             message: "No active challenge"
-        }
+        })
     }
 
-    const image = challenge?.images?.find(item  => item.id === image_id)
+    const image = challenge?.images?.find(item => item.id === image_id)
 
     if (!image) {
-        return {
+        return reply.code(404).send({
             status: "error",
             message: "Image not found"
-        }
+        })
     }
 
     console.log("Requested image:", image_id, image)
-    return {
-        image
-    }
+    return reply.sendFile(image.path)
 })
 
-app.get("/captcha/challenges/:id", async (request) => {
+app.get("/captcha/challenges/:id", async (request, reply) => {
     const cookieHeader = request.headers.cookie as string | undefined
     const sessionId = await getSessionFromCookie(cookieHeader)
     if (!sessionId) {
-        return {
+        return reply.code(401).send({
             status: "error",
             message: "Missing session ID"
-        }
+        })
     }
 
     console.log("Session ID:", sessionId)
