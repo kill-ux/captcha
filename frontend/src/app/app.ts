@@ -10,7 +10,4 @@ import { CaptchaApi } from './core/services/captcha-api';
 })
 export class App {
   protected readonly title = signal('frontend');
-  constructor(private api: CaptchaApi){
-    this.api.startSession().subscribe(res => console.log('session:', res));
-  }
 }

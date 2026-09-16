@@ -1,1 +1,24 @@
-<p>captcha works!</p>
+@if (session.loading()) {
+  <p>Loading challenge…</p>
+} @else if (session.currentChallenge(); as challenge) {
+  <div class="captcha-stage">
+    @switch (challenge.type) {
+      @case (ChallengeType.Math) {
+        <app-math-challenge
+          [imageId]="challenge.images?.[0]"
+          [disabled]="submitting"
+          (answer)="onAnswer($event)">
+        </app-math-challenge>
+      }
+      @default {
+        <p>Unsupported challenge type.</p>
+      }
+    }
+
+    @if (feedback === 'incorrect') {
+      <p class="feedback error">Not quite — try again.</p>
+    }
+  </div>
+} @else if (session.error()) {
+  <p class="error">{{ session.error() }}</p>
+}
