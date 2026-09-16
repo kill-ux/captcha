@@ -21,7 +21,7 @@ export class CaptchaApi {
     return `/api/captcha/images/${imageId}`;
   }
 
-  verifyAnswer(challengeId: string, answer: string): Observable<VerifyResponse> {
+  verifyAnswer(challengeId: string, answer: string[] | string): Observable<VerifyResponse> {
     return this.http.post<VerifyResponse>(
       '/api/captcha/verify',
       { challengeId, answer },
