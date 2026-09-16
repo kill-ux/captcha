@@ -1,0 +1,30 @@
+import Fastify from "fastify"
+import fastifyStatic from "@fastify/static"
+import cors from "@fastify/cors"
+import path from "path"
+import { registerSessionPlugin } from "./plugins/session.plugin"
+import { healthRoutes } from "./routes/health.routes"
+import { sessionRoutes } from "./routes/session.routes"
+import { captchaRoutes } from "./routes/captcha.routes"
+
+const app = Fastify({ logger: true })
+
+app.register(cors, {
+    origin: "http://localhost:4200",
+    credentials: true,
+    methods: "*",
+    allowedHeaders: ["Content-Type"]
+})
+
+app.register(fastifyStatic, {
+    root: path.join(import.meta.dirname, "..", "res")
+})
+
+registerSessionPlugin(app)
+
+app.register(healthRoutes, { prefix: '/api' })
+app.register(sessionRoutes, { prefix: '/api' })
+app.register(captchaRoutes, { prefix: '/api' })
+
+await app.listen({ port: 3000, host: "0.0.0.0" })
+
