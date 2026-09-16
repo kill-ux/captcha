@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { CanActivateFn } from '@angular/router';
 
-import { captchaGuard } from './captcha-guard';
+import { challengeGuard } from './captcha-guard';
 
-describe('captchaGuard', () => {
+describe('challengeGuard', () => {
     const executeGuard: CanActivateFn = (...guardParameters) =>
-        TestBed.runInInjectionContext(() => captchaGuard(...guardParameters));
+        TestBed.runInInjectionContext(() => challengeGuard(...guardParameters));
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
