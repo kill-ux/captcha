@@ -24,7 +24,7 @@
     }
     }
 
-    @if (feedback === 'incorrect') {
+    @if (feedback() === 'incorrect') {
     <p class="feedback error">Not quite — try again.</p>
     }
 </div>

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Session } from '../../core/services/session';
 import { CaptchaApi } from '../../core/services/captcha-api';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-result',
@@ -21,10 +22,10 @@ export class Result {
     async restart(): Promise<void> {
         this.restarting = true;
         try {
-            await this.api.startSession();
+            await firstValueFrom(this.api.resetSession());
             this.session.completed.set(false);
             this.session.currentChallenge.set(null);
-            await this.session.ensureSession();
+            await this.session.refreshChallenge(); 
             this.router.navigate(['/captcha']);
         } finally {
             this.restarting = false;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ChallengeType } from '../../core/models/challenge';
 import { Session } from '../../core/services/session';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ export class Captcha implements OnInit {
 
     ChallengeType = ChallengeType;
     submitting = false;
-    feedback: 'correct' | 'incorrect' | null = null;
+    feedback = signal<'correct' | 'incorrect' | null>(null)
 
     constructor(public session: Session, private router: Router) { }
 
@@ -34,11 +34,11 @@ export class Captcha implements OnInit {
         if (!challenge?.id) return;
 
         this.submitting = true;
-        this.feedback = null;
+        this.feedback.set(null)
 
         try {
             const result = await this.session.submitAnswer(challenge.id, answer);
-            this.feedback = result;
+            this.feedback.set(result);
             if (result === 'correct' && this.session.completed()) {
                 this.router.navigate(['/result']);
             }

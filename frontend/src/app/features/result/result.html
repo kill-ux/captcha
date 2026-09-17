@@ -1,8 +1,21 @@
-<section class="result">
-  <h1>Challenge Complete</h1>
-  <p>You made it through every stage.</p>
+<section class="min-h-screen flex flex-col items-center justify-center gap-6 bg-slate-950 text-slate-100 px-4">
+  <div class="flex flex-col items-center gap-4 text-center">
+    <div class="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/40 flex items-center justify-center">
+      <svg class="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
 
-  <button (click)="restart()" [disabled]="restarting">
+    <h1 class="text-3xl font-semibold tracking-tight">Challenge Complete</h1>
+    <p class="text-slate-400 max-w-sm">You made it through every stage. Nice work.</p>
+  </div>
+
+  <button
+    (click)="restart()"
+    [disabled]="restarting"
+    class="px-6 py-2.5 rounded-lg bg-emerald-500 text-slate-950 font-medium
+           hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed
+           transition-colors">
     {{ restarting ? 'Restarting…' : 'Restart Challenge' }}
   </button>
 </section>

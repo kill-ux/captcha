@@ -11,6 +11,6 @@
   }
 </div>
 
-<button (click)="submit()" [disabled]="disabled || selected.size === 0">
+<button (click)="submit()" [disabled]="disabled() || selected.size === 0">
   Submit ({{ selected.size }} selected)
 </button>

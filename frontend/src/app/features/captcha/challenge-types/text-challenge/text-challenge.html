@@ -9,5 +9,5 @@
   @if (answerControl.invalid && answerControl.touched) {
     <p class="field-error">This field is required.</p>
   }
-  <button (click)="submit()" [disabled]="disabled || answerControl.invalid">Submit</button>
+  <button (click)="submit()" [disabled]="disabled() || answerControl.invalid">Submit</button>
 </div>

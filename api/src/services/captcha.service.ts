@@ -89,3 +89,9 @@ export async function verifyChallenge(
     const completed = session.currentStage > session.totalStages
     return { ok: true, correct: true, completed, nextStage: completed ? null : session.currentStage }
 }
+
+
+export async function resetSession(oldSessionId: string): Promise<CaptchaSession> {
+    await repository.delete(oldSessionId)
+    return createSession()
+}

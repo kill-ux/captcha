@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify"
-import { createSession } from "../services/captcha.service"
+import { createSession, resetSession } from "../services/captcha.service"
 
 export async function sessionRoutes(app: FastifyInstance) {
     app.post("/captcha/sessions", async (request, reply) => {
@@ -8,6 +8,15 @@ export async function sessionRoutes(app: FastifyInstance) {
         }
 
         const session = await createSession()
+        reply.header("set-cookie", `sessionId=${session.sessionId}; Path=/; HttpOnly;`)
+        return { session }
+    })
+
+    app.post("/captcha/sessions/reset", async (request, reply) => {
+        const session = request.session
+            ? await resetSession(request.session.sessionId)
+            : await createSession()
+
         reply.header("set-cookie", `sessionId=${session.sessionId}; Path=/; HttpOnly;`)
         return { session }
     })

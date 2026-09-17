@@ -14,6 +14,10 @@ export class CaptchaApi {
     return this.http.post('/api/captcha/sessions', {}, { withCredentials: true });
   }
 
+  resetSession(): Observable<any> {
+    return this.http.post('/api/captcha/sessions/reset', {}, { withCredentials: true });
+  }
+
   getCurrentChallenge(): Observable<ChallengeResponse> {
     return this.http.get<ChallengeResponse>('/api/captcha', { withCredentials: true });
   }
