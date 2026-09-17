@@ -2,10 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ChallengeType } from '../../core/models/challenge';
 import { Session } from '../../core/services/session';
 import { Router } from '@angular/router';
+import { MathChallenge } from "./challenge-types/math-challenge/math-challenge";
+import { TextChallenge } from "./challenge-types/text-challenge/text-challenge";
+import { ImageSelectionChallenge } from "./challenge-types/image-selection-challenge/image-selection-challenge";
 
 @Component({
     selector: 'app-captcha',
-    imports: [],
+    imports: [MathChallenge, TextChallenge, ImageSelectionChallenge],
     templateUrl: './captcha.html',
     styleUrl: './captcha.css',
 })

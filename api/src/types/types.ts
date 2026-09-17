@@ -32,4 +32,5 @@ export type CaptchaChallenge = {
     images: ImageItem[];
     answerHash: string;
     completedAt: string | null;
+    prompt?: string
 }

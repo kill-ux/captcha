@@ -1,0 +1,16 @@
+<div class="image-grid">
+  @for (id of imageIds(); track id) {
+    <button
+      type="button"
+      class="grid-cell"
+      [class.selected]="isSelected(id)"
+      [disabled]="disabled()"
+      (click)="toggle(id)">
+      <img [src]="imageUrl(id)" alt="Selectable image" />
+    </button>
+  }
+</div>
+
+<button (click)="submit()" [disabled]="disabled || selected.size === 0">
+  Submit ({{ selected.size }} selected)
+</button>

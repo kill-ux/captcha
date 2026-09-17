@@ -180,7 +180,8 @@ export const imageSelectionChallenge: ChallengeGenerator = {
 
         return {
             images: shuffledImages,
-            answerHash: sha256(answerFor(correctImageIds))
+            answerHash: sha256(answerFor(correctImageIds)),
+            prompt: `Select all images with ${targetCategory}`
         }
     },
 

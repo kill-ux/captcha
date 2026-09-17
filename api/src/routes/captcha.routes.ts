@@ -12,7 +12,8 @@ export async function captchaRoutes(app: FastifyInstance) {
             type: challenge.type,
             status: challenge.status,
             images: challenge.images.map((image) => image.id),
-            completedAt: challenge.completedAt
+            completedAt: challenge.completedAt,
+            prompt: challenge.prompt
         }
     })
 

@@ -1,0 +1,13 @@
+<div class="text-challenge">
+  <img [src]="imageUrl" alt="Type what you see" />
+  <input
+    type="text"
+    [formControl]="answerControl"
+    [class.invalid]="answerControl.invalid && answerControl.touched"
+    placeholder="Type the text shown"
+    (keyup.enter)="submit()" />
+  @if (answerControl.invalid && answerControl.touched) {
+    <p class="field-error">This field is required.</p>
+  }
+  <button (click)="submit()" [disabled]="disabled || answerControl.invalid">Submit</button>
+</div>

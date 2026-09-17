@@ -46,6 +46,7 @@ export class Session {
     async submitAnswer(challengeId: string, answer: string[] | string): Promise<'correct' | 'incorrect'> {
         const res = await firstValueFrom(this.api.verifyAnswer(challengeId, answer))
         if (res.status == 'correct') {
+            console.log(res)
             if (res.completed) {
                 this.completed.set(true);
                 this.currentChallenge.set(null);

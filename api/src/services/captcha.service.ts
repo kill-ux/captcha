@@ -3,6 +3,7 @@ import { CaptchaSessionRepository } from "../repositories/session.repository"
 import type { CaptchaChallenge, CaptchaSession } from "../types/types"
 import { Status } from "../types/types"
 import { getChallengeTypeForStage, getGenerator } from "../challenges/registry"
+import type { GeneratedChallenge } from "../challenges/types";
 
 const repository = new CaptchaSessionRepository()
 
@@ -38,14 +39,15 @@ export async function createSession(): Promise<CaptchaSession> {
 async function createChallengeForCurrentStage(session: CaptchaSession): Promise<CaptchaChallenge> {
     const type = getChallengeTypeForStage(session.currentStage)
     const generator = getGenerator(type)
-    const { images, answerHash } = await generator.generate()
+    const generated: GeneratedChallenge = await generator.generate()
 
     const challenge: CaptchaChallenge = {
         id: crypto.randomUUID(),
         type,
         status: Status.Active,
-        images,
-        answerHash,
+        images: generated.images,
+        prompt: generated.prompt,
+        answerHash: generated.answerHash,
         completedAt: null
     }
 

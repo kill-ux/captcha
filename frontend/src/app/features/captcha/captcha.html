@@ -1,24 +1,33 @@
 @if (session.loading()) {
-  <p>Loading challenge…</p>
+<p>Loading challenge…</p>
 } @else if (session.currentChallenge(); as challenge) {
-  <div class="captcha-stage">
+<div class="captcha-stage">
+    @if (challenge.prompt) {
+    <p class="prompt">{{ challenge.prompt }}</p>
+    }
     @switch (challenge.type) {
-      @case (ChallengeType.Math) {
-        <app-math-challenge
-          [imageId]="challenge.images?.[0]"
-          [disabled]="submitting"
-          (answer)="onAnswer($event)">
-        </app-math-challenge>
-      }
-      @default {
-        <p>Unsupported challenge type.</p>
-      }
+    @case (ChallengeType.Math) {
+    <app-math-challenge [imageId]="challenge.images?.[0]" [disabled]="submitting" (answer)="onAnswer($event)">
+    </app-math-challenge>
+    }
+    @case (ChallengeType.Text) {
+    <app-text-challenge [imageId]="challenge.images?.[0]" [disabled]="submitting" (answer)="onAnswer($event)">
+    </app-text-challenge>
+    }
+    @case (ChallengeType.ImageSelection) {
+    <app-image-selection-challenge [imageIds]="challenge.images ?? []" [disabled]="submitting"
+        (answer)="onAnswer($event)">
+    </app-image-selection-challenge>
+    }
+    @default {
+    <p>Unsupported challenge type.</p>
+    }
     }
 
     @if (feedback === 'incorrect') {
-      <p class="feedback error">Not quite — try again.</p>
+    <p class="feedback error">Not quite — try again.</p>
     }
-  </div>
+</div>
 } @else if (session.error()) {
-  <p class="error">{{ session.error() }}</p>
+<p class="error">{{ session.error() }}</p>
 }

@@ -1,1 +1,8 @@
-<p>result works!</p>
+<section class="result">
+  <h1>Challenge Complete</h1>
+  <p>You made it through every stage.</p>
+
+  <button (click)="restart()" [disabled]="restarting">
+    {{ restarting ? 'Restarting…' : 'Restart Challenge' }}
+  </button>
+</section>

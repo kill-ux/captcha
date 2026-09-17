@@ -1,1 +1,15 @@
-<p>math-challenge works!</p>
+<div class="math-challenge">
+    <img [src]="imageUrl" alt="Math challenge">
+    <input type="text" inputmode="numeric" [formControl]="answerControl"
+        [class.invalid]="answerControl.invalid && answerControl.touched" placeholder="Your answer"
+        (keyup.enter)="submit()">
+
+    @if (answerControl.invalid && answerControl.touched) {
+    <p class="field-error">Enter a whole number.</p>
+    }
+
+    <button (click)="submit()" [disabled]="disabled || answerControl.invalid">
+        Submit
+    </button>
+
+</div>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ChallengeResponse, VerifyResponse } from '../models/challenge';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +19,7 @@ export class CaptchaApi {
   }
 
   getImageUrl(imageId: string): string {
-    return `/api/captcha/images/${imageId}`;
+    return `${environment.apiUrl}/api/captcha/images/${imageId}`;
   }
 
   verifyAnswer(challengeId: string, answer: string[] | string): Observable<VerifyResponse> {
