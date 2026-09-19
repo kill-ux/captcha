@@ -1,15 +1,32 @@
-<div class="math-challenge">
-    <img [src]="imageUrl" alt="Math challenge">
-    <input type="text" inputmode="numeric" [formControl]="answerControl"
-        [class.invalid]="answerControl.invalid && answerControl.touched" placeholder="Your answer"
-        (keyup.enter)="submit()">
+<div class="flex flex-col gap-4">
+  <div class="border-[3px] border-[#2a2a2a] bg-[#0f0f0f] p-1">
+    <img [src]="imageUrl" alt="Math challenge" class="w-full block" />
+  </div>
 
-    @if (answerControl.invalid && answerControl.touched) {
-    <p class="field-error">Enter a whole number.</p>
-    }
+  <input
+    type="text"
+    inputmode="numeric"
+    [formControl]="answerControl"
+    placeholder="ANSWER"
+    (keyup.enter)="submit()"
+    class="w-full px-4 py-3 text-sm font-bold tracking-wide uppercase text-center
+           bg-[#1a1a1a] border-[3px] border-[#2a2a2a]
+           text-[#e5e5e5]
+           focus:outline-none focus:bg-[#111111] focus:border-[#4ade80]
+           placeholder:text-[#e5e5e5]/30" />
 
-    <button (click)="submit()" [disabled]="disabled() || answerControl.invalid">
-        Submit
-    </button>
+  @if (answerControl.invalid && answerControl.touched) {
+    <p class="text-[11px] text-[#ff3b30] font-bold uppercase tracking-wide">[ERR] Enter a whole number</p>
+  }
 
+  <button
+    (click)="submit()"
+    [disabled]="disabled() || answerControl.invalid"
+    class="press-btn w-full py-3 text-sm font-bold tracking-[0.15em] uppercase
+           bg-[#0f0f0f] text-[#e5e5e5] border-[3px] border-[#2a2a2a]
+           shadow-[5px_5px_0_#4ade80]
+           hover:bg-[#1a1a1a]
+           disabled:opacity-40 disabled:cursor-not-allowed">
+    Submit
+  </button>
 </div>

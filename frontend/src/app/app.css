@@ -1,0 +1,7 @@
+.press-btn {
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.press-btn:active:not(:disabled) {
+  transform: translate(5px, 5px);
+  box-shadow: 0 0 0 #c1121f;
+}

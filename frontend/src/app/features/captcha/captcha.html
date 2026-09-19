@@ -1,33 +1,70 @@
-@if (session.loading()) {
-<p>Loading challenge…</p>
-} @else if (session.currentChallenge(); as challenge) {
-<div class="captcha-stage">
-    @if (challenge.prompt) {
-    <p class="prompt">{{ challenge.prompt }}</p>
-    }
-    @switch (challenge.type) {
-    @case (ChallengeType.Math) {
-    <app-math-challenge [imageId]="challenge.images?.[0]" [disabled]="submitting" (answer)="onAnswer($event)">
-    </app-math-challenge>
-    }
-    @case (ChallengeType.Text) {
-    <app-text-challenge [imageId]="challenge.images?.[0]" [disabled]="submitting" (answer)="onAnswer($event)">
-    </app-text-challenge>
-    }
-    @case (ChallengeType.ImageSelection) {
-    <app-image-selection-challenge [imageIds]="challenge.images ?? []" [disabled]="submitting"
-        (answer)="onAnswer($event)">
-    </app-image-selection-challenge>
-    }
-    @default {
-    <p>Unsupported challenge type.</p>
-    }
-    }
+<section class="min-h-screen flex items-center justify-center bg-[#111111] px-4 font-mono">
 
-    @if (feedback() === 'incorrect') {
-    <p class="feedback error">Not quite — try again.</p>
-    }
-</div>
-} @else if (session.error()) {
-<p class="error">{{ session.error() }}</p>
-}
+  <div class="relative w-full max-w-md">
+
+    <div class="absolute -top-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
+    <div class="absolute -top-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
+
+    <div class="bg-[#1a1a1a] border-[3px] border-[#2a2a2a] shadow-[8px_8px_0_#000000]">
+
+      <div class="flex items-center justify-between border-b-[3px] border-[#2a2a2a] px-4 py-2 bg-[#0f0f0f] text-[#e5e5e5]">
+        <span class="text-[11px] tracking-[0.2em] uppercase">SYS // CHALLENGE-ACTIVE</span>
+        <span class="text-[11px] tracking-[0.2em]">02</span>
+      </div>
+
+      <div class="px-8 py-10 flex flex-col items-center gap-6">
+
+        @if (session.loading()) {
+          <div class="flex items-center gap-2 text-[12px] text-[#e5e5e5]/60 tracking-wide py-8">
+            <span class="loader-block"></span>
+            LOADING CHALLENGE…
+          </div>
+        } @else if (session.currentChallenge(); as challenge) {
+
+          @if (challenge.prompt) {
+            <p class="w-full text-[12px] font-bold uppercase tracking-wide text-[#e5e5e5] bg-[#1a1a1a] border-[3px] border-[#2a2a2a] px-4 py-2.5 text-center">
+              {{ challenge.prompt }}
+            </p>
+          }
+
+          <div class="w-full">
+            @switch (challenge.type) {
+              @case (ChallengeType.Math) {
+                <app-math-challenge [imageId]="challenge.images?.[0]" [disabled]="submitting" (answer)="onAnswer($event)">
+                </app-math-challenge>
+              }
+              @case (ChallengeType.Text) {
+                <app-text-challenge [imageId]="challenge.images?.[0]" [disabled]="submitting" (answer)="onAnswer($event)">
+                </app-text-challenge>
+              }
+              @case (ChallengeType.ImageSelection) {
+                <app-image-selection-challenge [imageIds]="challenge.images ?? []" [disabled]="submitting" (answer)="onAnswer($event)">
+                </app-image-selection-challenge>
+              }
+              @default {
+                <p class="text-[12px] text-[#e5e5e5]/60">Unsupported challenge type.</p>
+              }
+            }
+          </div>
+
+          @if (feedback() === 'incorrect') {
+            <p class="w-full text-[12px] font-bold text-[#ff3b30] border-[3px] border-[#ff3b30] px-4 py-2 text-center uppercase tracking-wide">
+              [ERR] Incorrect — try again
+            </p>
+          }
+
+        } @else if (session.error()) {
+          <p class="text-[12px] text-[#ff3b30] font-bold">[ERR] {{ session.error() }}</p>
+        }
+      </div>
+
+      <div class="border-t-[3px] border-[#2a2a2a] px-4 py-1.5 flex justify-between text-[10px] text-[#e5e5e5]/50 tracking-[0.15em] uppercase">
+        <span>Angul-It Terminal</span>
+        <span>Stage in progress</span>
+      </div>
+    </div>
+
+    <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
+    <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
+  </div>
+</section>

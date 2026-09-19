@@ -1,16 +1,30 @@
-<div class="image-grid">
-  @for (id of imageIds(); track id) {
-    <button
-      type="button"
-      class="grid-cell"
-      [class.selected]="isSelected(id)"
-      [disabled]="disabled()"
-      (click)="toggle(id)">
-      <img [src]="imageUrl(id)" alt="Selectable image" />
-    </button>
-  }
-</div>
+<div class="flex flex-col gap-4">
+  <div class="grid grid-cols-3 gap-2">
+    @for (id of imageIds(); track id) {
+      <button
+        type="button"
+        [disabled]="disabled()"
+        (click)="toggle(id)"
+        class="relative border-[3px] p-0.5 aspect-square overflow-hidden transition-colors"
+        [class.border-[#2a2a2a]]="!isSelected(id)"
+        [class.border-[#ff3b30]]="isSelected(id)">
+        <img [src]="imageUrl(id)" alt="Selectable image" class="w-full h-full object-cover block"
+             [class.opacity-50]="isSelected(id)" />
+        @if (isSelected(id)) {
+          <span class="absolute inset-0 flex items-center justify-center text-[#ff3b30] text-2xl font-black bg-[#1a1a1a]/40">✕</span>
+        }
+      </button>
+    }
+  </div>
 
-<button (click)="submit()" [disabled]="disabled() || selected.size === 0">
-  Submit ({{ selected.size }} selected)
-</button>
+  <button
+    (click)="submit()"
+    [disabled]="disabled() || selected.size === 0"
+    class="press-btn w-full py-3 text-sm font-bold tracking-[0.15em] uppercase
+           bg-[#0f0f0f] text-[#e5e5e5] border-[3px] border-[#2a2a2a]
+           shadow-[5px_5px_0_#ff3b30]
+           hover:bg-[#1a1a1a]
+           disabled:opacity-40 disabled:cursor-not-allowed">
+    Submit ({{ selected.size }} selected)
+  </button>
+</div>

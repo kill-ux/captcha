@@ -1,25 +1,13 @@
-<!-- <section class="home">
-    <h1>Angul-It</h1>
-    <p>Prove you're human. Complete every stage to pass.</p>
-    <button (click)="start()" [disabled]="starting">
-        {{ starting ? 'Starting…' : 'Start Challenge' }}
-    </button>
-    @if (error) {
-    <p class="error">{{ error }}</p>
-    }
-</section> -->
-<section class="min-h-screen flex items-center justify-center bg-[#e8e6df] px-4 font-mono">
+<section class="min-h-screen flex items-center justify-center bg-[#111111] px-4 font-mono">
 
   <div class="relative w-full max-w-md">
 
-    <!-- hazard corner tabs -->
-    <div class="absolute -top-3 -left-3 w-6 h-6 bg-[#0a0a0a]"></div>
-    <div class="absolute -top-3 -right-3 w-6 h-6 bg-[#0a0a0a]"></div>
+    <div class="absolute -top-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
+    <div class="absolute -top-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
 
-    <div class="bg-[#f4f2ec] border-[3px] border-[#0a0a0a] shadow-[8px_8px_0_#0a0a0a]">
+    <div class="bg-[#1a1a1a] border-[3px] border-[#2a2a2a] shadow-[8px_8px_0_#000000]">
 
-      <!-- header strip -->
-      <div class="flex items-center justify-between border-b-[3px] border-[#0a0a0a] px-4 py-2 bg-[#0a0a0a] text-[#f4f2ec]">
+      <div class="flex items-center justify-between border-b-[3px] border-[#2a2a2a] px-4 py-2 bg-[#0f0f0f] text-[#e5e5e5]">
         <span class="text-[11px] tracking-[0.2em] uppercase">SYS // ACCESS-CTRL</span>
         <span class="text-[11px] tracking-[0.2em]">01</span>
       </div>
@@ -27,42 +15,41 @@
       <div class="px-8 py-10 flex flex-col items-center gap-7 text-center">
 
         <div class="flex flex-col gap-1">
-          <h1 class="text-3xl font-black tracking-tight text-[#0a0a0a] uppercase">
-            Angul<span class="text-[#c1121f]">—</span>It
+          <h1 class="text-3xl font-black tracking-tight text-[#e5e5e5] uppercase">
+            Angul<span class="text-[#ff3b30]">—</span>It
           </h1>
-          <p class="text-[12px] text-[#0a0a0a]/60 tracking-wide">
+          <p class="text-[12px] text-[#e5e5e5]/60 tracking-wide">
             [ human verification required ]
           </p>
         </div>
 
-        <div class="w-full border-t-[3px] border-dashed border-[#0a0a0a]/25"></div>
+        <div class="w-full border-t-[3px] border-dashed border-[#e5e5e5]/20"></div>
 
         <button
           (click)="start()"
           [disabled]="starting"
           class="press-btn w-full py-3.5 text-sm font-bold tracking-[0.15em] uppercase
-                 bg-[#0a0a0a] text-[#f4f2ec]
-                 border-[3px] border-[#0a0a0a]
-                 shadow-[5px_5px_0_#c1121f]
+                 bg-[#0f0f0f] text-[#e5e5e5]
+                 border-[3px] border-[#2a2a2a]
+                 shadow-[5px_5px_0_#ff3b30]
                  disabled:opacity-40 disabled:cursor-not-allowed">
-          {{ starting ? 'AUTHENTICATING' : 'START VERIFICATION' }}
+          {{ starting ? 'AUTHENTICATING' : 'START / CONTINUE [VERIFICATION]' }}
         </button>
 
         @if (error) {
-          <p class="text-[12px] text-[#c1121f] font-bold tracking-wide">
+          <p class="text-[12px] text-[#ff3b30] font-bold tracking-wide">
             [ERR] {{ error }}
           </p>
         }
       </div>
 
-      <!-- footer strip -->
-      <div class="border-t-[3px] border-[#0a0a0a] px-4 py-1.5 flex justify-between text-[10px] text-[#0a0a0a]/50 tracking-[0.15em] uppercase">
+      <div class="border-t-[3px] border-[#2a2a2a] px-4 py-1.5 flex justify-between text-[10px] text-[#e5e5e5]/50 tracking-[0.15em] uppercase">
         <span>Angul-It Terminal</span>
         <span>Not a robot? Prove it.</span>
       </div>
     </div>
 
-    <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-[#0a0a0a]"></div>
-    <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-[#0a0a0a]"></div>
+    <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
+    <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
   </div>
 </section>

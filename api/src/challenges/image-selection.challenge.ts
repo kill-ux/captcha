@@ -10,8 +10,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const IMAGES_ROOT = join(__dirname, "..", "..", "res", "png_ready")
 
 const GRID_SIZE = 9;
-const TARGET_IMAGE_COUNT = 4;
-const DISTRACTOR_IMAGE_COUNT = GRID_SIZE - TARGET_IMAGE_COUNT;
+const MIN_TARGET_IMAGE_COUNT = 2;
+const MAX_TARGET_IMAGE_COUNT = 5;
 
 type ImageFile = {
     category: string;
@@ -19,10 +19,12 @@ type ImageFile = {
     path: string;
 };
 
-// type InternalImageChallenge = GeneratedChallenge & {
-//     targetCategory: string;
-//     correctImageIds: string[];
-// };
+function randomInt(min: number, max: number): number {
+    return Math.floor(
+        Math.random() * (max - min + 1),
+    ) + min;
+}
+
 
 async function listCategories(): Promise<string[]> {
     const entries = await readdir(IMAGES_ROOT, {
@@ -156,13 +158,23 @@ export const imageSelectionChallenge: ChallengeGenerator = {
         const targetImages = await listImagesInCategory(targetCategory)
         const distractorCategories = categories.filter(category => category != targetCategory)
         const distractorImages: ImageFile[] = []
-        for (let index = 0; index < DISTRACTOR_IMAGE_COUNT; index++) {
+
+        const targetImageCount = randomInt(
+            MIN_TARGET_IMAGE_COUNT,
+            MAX_TARGET_IMAGE_COUNT,
+        );
+
+        const distractorImageCount = GRID_SIZE - targetImageCount;
+
+
+        for (let index = 0; index < distractorImageCount; index++) {
             const category = randomItem(distractorCategories)
             const images = await listImagesInCategory(category)
             distractorImages.push(randomItem(images))
         }
 
-        const selectedTargetImages = randomItems(targetImages, TARGET_IMAGE_COUNT)
+
+        const selectedTargetImages = randomItems(targetImages, targetImageCount)
         const allImages = [...selectedTargetImages, ...distractorImages]
 
         const generatedImages = allImages.map(image => ({

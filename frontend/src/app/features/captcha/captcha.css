@@ -1,0 +1,9 @@
+.loader-block {
+  width: 10px;
+  height: 10px;
+  background: #0a0a0a;
+  animation: blink-block 0.9s steps(2, start) infinite;
+}
+@keyframes blink-block {
+  50% { opacity: 0.15; }
+}
