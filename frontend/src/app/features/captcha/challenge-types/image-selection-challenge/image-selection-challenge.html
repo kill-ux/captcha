@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-4">
+<!-- <div class="flex flex-col gap-4">
   <div class="grid grid-cols-3 gap-2">
     @for (id of imageIds(); track id) {
       <button
@@ -27,4 +27,45 @@
            disabled:opacity-40 disabled:cursor-not-allowed">
     Submit ({{ selected.size }} selected)
   </button>
+</div> -->
+
+
+<div class="flex flex-col gap-4">
+  <div role="group" [attr.aria-label]="label()" class="grid grid-cols-3 gap-2">
+    @for (id of imageIds(); track id; let i = $index) {
+      <button
+        type="button"
+        [disabled]="disabled()"
+        [attr.aria-pressed]="isSelected(id)"
+        [attr.aria-label]="'Image ' + (i + 1) + ' of ' + imageIds().length"
+        (click)="toggle(id)"
+        class="relative border-[3px] p-0.5 aspect-square overflow-hidden transition-colors"
+        [class]="isSelected(id) ? 'border-[#ff3b30]' : 'border-[#2a2a2a]'">
+        <img [src]="imageUrl(id)" [alt]="'Grid image ' + (i + 1)" class="w-full h-full object-cover block"
+             [class.opacity-50]="isSelected(id)" />
+        @if (isSelected(id)) {
+          <span aria-hidden="true" class="absolute inset-0 flex items-center justify-center text-[#ff3b30] text-2xl font-black bg-[#1a1a1a]/40">✕</span>
+        }
+      </button>
+    }
+  </div>
+
+  @if (errorMessage; as message) {
+    <p id="image-error" role="alert" class="text-[11px] text-[#ff3b30] font-bold uppercase tracking-wide">[ERR] {{ message }}</p>
+  }
+
+  @if (!readonly()) {
+    <button
+      type="button"
+      (click)="submit()"
+      [disabled]="disabled()"
+      [attr.aria-describedby]="errorMessage ? 'image-error' : null"
+      class="press-btn w-full py-3 text-sm font-bold tracking-[0.15em] uppercase
+             bg-[#0f0f0f] text-[#e5e5e5] border-[3px] border-[#2a2a2a]
+             shadow-[5px_5px_0_#ff3b30]
+             hover:bg-[#1a1a1a]
+             disabled:opacity-40 disabled:cursor-not-allowed">
+      Submit ({{ selection.value.length }} selected)
+    </button>
+  }
 </div>

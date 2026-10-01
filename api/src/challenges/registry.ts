@@ -10,13 +10,19 @@ const generators: Partial<Record<ChallengeType, ChallengeGenerator>> = {
     [ChallengeType.ImageSelection]: imageSelectionChallenge
 }
 
-// Which challenge type appears at which stage number.
-const stagePlan: ChallengeType[] = [ChallengeType.Math, ChallengeType.Text, ChallengeType.ImageSelection]
+const ALL_TYPES: ChallengeType[] = [ChallengeType.Math, ChallengeType.Text, ChallengeType.ImageSelection]
 
-export function getChallengeTypeForStage(stage: number): ChallengeType {
-    const type = stagePlan[stage - 1]
-    if (!type) throw new Error(`No challenge configured for stage ${stage}`)
-    return type
+/**
+ * Builds the challenge order for a new session: every type exactly once,
+ * in a random order (Fisher-Yates), so each session gets a different set/order.
+ */
+export function buildStagePlan(): ChallengeType[] {
+    const plan = [...ALL_TYPES]
+    for (let i = plan.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [plan[i], plan[j]] = [plan[j]!, plan[i]!]
+    }
+    return plan
 }
 
 export function getGenerator(type: ChallengeType): ChallengeGenerator {
@@ -24,4 +30,3 @@ export function getGenerator(type: ChallengeType): ChallengeGenerator {
     if (!generator) throw new Error(`No generator registered for type ${type}`)
     return generator
 }
-

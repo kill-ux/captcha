@@ -1,5 +1,5 @@
 import { redis } from "bun"
-import type { CaptchaSession } from "../types/types"
+import { type CaptchaSession } from "../types/types"
 
 const SESSION_TTL_SECONDS = 15 * 60 // 15 minutes
 
@@ -23,7 +23,7 @@ export class CaptchaSessionRepository {
             return null
         }
 
-        return JSON.parse(rawSession) as CaptchaSession
+        return JSON.parse(rawSession)
     }
 
     async delete(sessionId: string): Promise<void> {
@@ -37,4 +37,5 @@ export class CaptchaSessionRepository {
         );
     }
 }
+
 

@@ -1,3 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+/* Visible keyboard focus everywhere (buttons, inputs, links). */
+:focus-visible {
+  outline: 3px solid #4ade80;
+  outline-offset: 2px;
+}

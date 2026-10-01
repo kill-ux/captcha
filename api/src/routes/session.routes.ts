@@ -1,6 +1,9 @@
 import type { FastifyInstance } from "fastify"
 import { createSession, resetSession } from "../services/captcha.service"
 
+// HttpOnly keeps the id away from scripts; SameSite=Lax blocks cross-site POSTs.
+const sessionCookie = (sessionId: string) => `sessionId=${sessionId}; Path=/; HttpOnly; SameSite=Lax`
+
 export async function sessionRoutes(app: FastifyInstance) {
     app.post("/captcha/sessions", async (request, reply) => {
         if (request.session) {
@@ -8,8 +11,8 @@ export async function sessionRoutes(app: FastifyInstance) {
         }
 
         const session = await createSession()
-        reply.header("set-cookie", `sessionId=${session.sessionId}; Path=/; HttpOnly;`)
-        return { session }
+        reply.header("set-cookie", sessionCookie(session.sessionId))
+        return { session: { totalStages: session.totalStages, currentStage: session.currentStage } }
     })
 
     app.post("/captcha/sessions/reset", async (request, reply) => {
@@ -17,7 +20,7 @@ export async function sessionRoutes(app: FastifyInstance) {
             ? await resetSession(request.session.sessionId)
             : await createSession()
 
-        reply.header("set-cookie", `sessionId=${session.sessionId}; Path=/; HttpOnly;`)
-        return { session }
+        reply.header("set-cookie", sessionCookie(session.sessionId))
+        return { session: { totalStages: session.totalStages, currentStage: session.currentStage } }
     })
 }

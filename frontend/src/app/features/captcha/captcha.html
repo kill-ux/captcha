@@ -1,4 +1,4 @@
-<section class="min-h-screen flex items-center justify-center bg-[#111111] px-4 font-mono">
+<!-- <section class="min-h-screen flex items-center justify-center bg-[#111111] px-4 font-mono">
 
   <div class="relative w-full max-w-md">
 
@@ -67,4 +67,194 @@
     <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
     <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
   </div>
-</section>
+</section> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<main class="min-h-screen flex items-center justify-center bg-[#111111] px-4 py-8 font-mono">
+
+  <div class="relative w-full max-w-md">
+
+    <div class="absolute -top-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
+    <div class="absolute -top-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
+
+    <div class="bg-[#1a1a1a] border-[3px] border-[#2a2a2a] shadow-[8px_8px_0_#000000]">
+
+      <div class="flex items-center justify-between border-b-[3px] border-[#2a2a2a] px-4 py-2 bg-[#0f0f0f] text-[#e5e5e5]">
+        <span class="text-[11px] tracking-[0.2em] uppercase">
+          {{ isReview() ? 'SYS // STAGE-REVIEW' : 'SYS // CHALLENGE-ACTIVE' }}
+        </span>
+        <span class="text-[11px] tracking-[0.2em]" aria-hidden="true">{{ stageLabel() }}</span>
+      </div>
+
+      <div class="px-5 sm:px-8 py-8 flex flex-col items-center gap-6">
+
+        <h1 class="sr-only">Human verification, stage {{ stage() }} of {{ totalStages() }}</h1>
+
+        @if (totalStages() > 0) {
+          <nav aria-label="Stages" class="flex items-center gap-2">
+            @for (s of stages(); track s) {
+              <button
+                type="button"
+                (click)="goTo(s)"
+                [disabled]="s > reachableStage() || submitting()"
+                [attr.aria-current]="s === stage() ? 'step' : null"
+                [attr.aria-label]="'Stage ' + s + (isSolved(s) ? ', completed' : '')"
+                class="h-9 w-9 text-[12px] font-bold border-[3px] transition-colors
+                       disabled:opacity-40 disabled:cursor-not-allowed"
+                [class]="s === stage()
+                  ? 'border-[#4ade80] text-[#4ade80] bg-[#0f0f0f]'
+                  : isSolved(s)
+                    ? 'border-[#2a2a2a] text-[#4ade80] hover:bg-[#0f0f0f]'
+                    : 'border-[#2a2a2a] text-[#e5e5e5]/60'">
+                {{ s }}
+              </button>
+            }
+          </nav>
+        }
+
+        @if (session.loading()) {
+          <div role="status" class="flex items-center gap-2 text-[12px] text-[#e5e5e5]/70 tracking-wide py-8">
+            <span class="loader-block" aria-hidden="true"></span>
+            LOADING CHALLENGE…
+          </div>
+        } @else if (visible().length > 0) {
+
+          @for (challenge of visible(); track challenge.id) {
+            <div class="stage-enter w-full flex flex-col gap-6">
+
+              @if (challenge.prompt) {
+                <p class="w-full text-[12px] font-bold uppercase tracking-wide text-[#e5e5e5] bg-[#1a1a1a] border-[3px] border-[#2a2a2a] px-4 py-2.5 text-center">
+                  {{ challenge.prompt }}
+                </p>
+              }
+
+              @if (isReview()) {
+                <p class="w-full text-[11px] font-bold uppercase tracking-wide text-[#4ade80] border-[3px] border-[#4ade80]/40 px-4 py-2 text-center">
+                  [OK] Stage completed — read-only review
+                </p>
+              }
+
+              <div class="w-full">
+                @switch (challenge.type) {
+                  @case (ChallengeType.Math) {
+                    <app-math-challenge
+                      [imageId]="challenge.images[0]"
+                      [disabled]="submitting()"
+                      [readonly]="isReview()"
+                      [initialAnswer]="isReview() ? $any(challenge.submittedAnswer) : undefined"
+                      (answer)="onAnswer($event)">
+                    </app-math-challenge>
+                  }
+                  @case (ChallengeType.Text) {
+                    <app-text-challenge
+                      [imageId]="challenge.images[0]"
+                      [disabled]="submitting()"
+                      [readonly]="isReview()"
+                      [initialAnswer]="isReview() ? $any(challenge.submittedAnswer) : undefined"
+                      (answer)="onAnswer($event)">
+                    </app-text-challenge>
+                  }
+                  @case (ChallengeType.ImageSelection) {
+                    <app-image-selection-challenge
+                      [imageIds]="challenge.images"
+                      [label]="challenge.prompt ?? 'Image grid'"
+                      [disabled]="submitting()"
+                      [readonly]="isReview()"
+                      [initialAnswer]="isReview() ? $any(challenge.submittedAnswer) : undefined"
+                      (answer)="onAnswer($event)">
+                    </app-image-selection-challenge>
+                  }
+                  @default {
+                    <p class="text-[12px] text-[#e5e5e5]/70">Unsupported challenge type.</p>
+                  }
+                }
+              </div>
+            </div>
+          }
+
+          @if (feedback() === 'incorrect') {
+            <p role="alert" class="w-full text-[12px] font-bold text-[#ff3b30] border-[3px] border-[#ff3b30] px-4 py-2 text-center uppercase tracking-wide">
+              [ERR] Incorrect — here is a new challenge, try again
+            </p>
+          }
+
+          <div class="w-full flex items-center justify-between gap-3 border-t-[3px] border-dashed border-[#e5e5e5]/20 pt-5">
+            <button
+              type="button"
+              (click)="goTo(stage() - 1)"
+              [disabled]="!canGoBack() || submitting()"
+              class="press-btn px-4 py-2 text-[12px] font-bold tracking-[0.12em] uppercase
+                     bg-[#0f0f0f] text-[#e5e5e5] border-[3px] border-[#2a2a2a]
+                     hover:bg-[#1a1a1a]
+                     disabled:opacity-30 disabled:cursor-not-allowed">
+              ← Previous
+            </button>
+
+            @if (canViewResults()) {
+              <button
+                type="button"
+                (click)="viewResults()"
+                class="press-btn px-4 py-2 text-[12px] font-bold tracking-[0.12em] uppercase
+                       bg-[#0f0f0f] text-[#4ade80] border-[3px] border-[#4ade80]/60
+                       hover:bg-[#1a1a1a]">
+                Results →
+              </button>
+            } @else {
+              <button
+                type="button"
+                (click)="goTo(stage() + 1)"
+                [disabled]="!canGoNext() || submitting()"
+                class="press-btn px-4 py-2 text-[12px] font-bold tracking-[0.12em] uppercase
+                       bg-[#0f0f0f] text-[#e5e5e5] border-[3px] border-[#2a2a2a]
+                       hover:bg-[#1a1a1a]
+                       disabled:opacity-30 disabled:cursor-not-allowed">
+                Next →
+              </button>
+            }
+          </div>
+
+          @if (!isReview()) {
+            <p class="text-[10px] text-[#e5e5e5]/60 tracking-wide uppercase text-center -mt-2">
+              Solve this stage to unlock the next one
+            </p>
+          }
+
+        } @else if (session.error()) {
+          <p role="alert" class="text-[12px] text-[#ff3b30] font-bold">[ERR] {{ session.error() }}</p>
+        }
+
+        @if (feedback() === 'error') {
+          <p role="alert" class="w-full text-[12px] font-bold text-[#ff3b30] border-[3px] border-[#ff3b30] px-4 py-2 text-center uppercase tracking-wide">
+            [ERR] Something went wrong (your session may have expired). The challenge was reloaded.
+          </p>
+        }
+      </div>
+
+      <div class="border-t-[3px] border-[#2a2a2a] px-4 py-1.5 flex justify-between text-[10px] text-[#e5e5e5]/60 tracking-[0.15em] uppercase">
+        <span>Angul-It Terminal</span>
+        <span>Stage {{ stage() }} / {{ totalStages() }}</span>
+      </div>
+    </div>
+
+    <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
+    <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
+  </div>
+</main>

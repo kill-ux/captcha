@@ -134,13 +134,9 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 
-// function imageId(
-//     category: string,
-//     filename: string,
-// ): string {
-//     return `${category}/${filename}`;
-// }
-
+function isStringArray(value: unknown): value is string[] {
+    return Array.isArray(value) && value.every((item) => typeof item === "string")
+}
 
 function answerFor(
     selectedIds: string[],
@@ -197,7 +193,12 @@ export const imageSelectionChallenge: ChallengeGenerator = {
         }
     },
 
-    verify(answer: string[], challenge): boolean {
-        return verifyHash(answerFor(answer), challenge.answerHash)
+    verify(answer, challenge): boolean {
+        if (!isStringArray(answer)) return false
+        return verifyHash(answerFor([...new Set(answer)]), challenge.answerHash)
+    },
+
+    normalize(answer): string[] {
+        return isStringArray(answer) ? [...new Set(answer)] : []
     }
 }

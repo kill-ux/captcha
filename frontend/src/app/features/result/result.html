@@ -1,4 +1,4 @@
-<section class="min-h-screen flex items-center justify-center bg-[#111111] px-4 font-mono">
+<!-- <section class="min-h-screen flex items-center justify-center bg-[#111111] px-4 font-mono">
 
   <div class="relative w-full max-w-md">
 
@@ -52,4 +52,116 @@
     <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
     <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
   </div>
-</section>
+</section> -->
+
+
+
+<main class="min-h-screen flex items-center justify-center bg-[#111111] px-4 py-8 font-mono">
+
+  <div class="relative w-full max-w-md">
+
+    <div class="absolute -top-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
+    <div class="absolute -top-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
+
+    <div class="bg-[#1a1a1a] border-[3px] border-[#2a2a2a] shadow-[8px_8px_0_#000000]">
+
+      <div class="flex items-center justify-between border-b-[3px] border-[#2a2a2a] px-4 py-2 bg-[#0f0f0f] text-[#e5e5e5]">
+        <span class="text-[11px] tracking-[0.2em] uppercase">SYS // ACCESS-CTRL</span>
+        <span class="text-[11px] tracking-[0.2em]" aria-hidden="true">03</span>
+      </div>
+
+      <div class="px-5 sm:px-8 py-8 flex flex-col items-center gap-6 text-center">
+
+        <div class="h-14 w-14 border-[3px] border-[#2a2a2a] flex items-center justify-center" aria-hidden="true">
+          <svg class="h-7 w-7 text-[#4ade80]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <h1 class="text-2xl font-black tracking-tight text-[#e5e5e5] uppercase">
+            Access Granted
+          </h1>
+          <p class="text-[12px] text-[#e5e5e5]/70 tracking-wide">
+            [ all stages verified ]
+          </p>
+        </div>
+
+        @if (result(); as r) {
+          <dl class="w-full grid grid-cols-3 gap-2 text-center">
+            <div class="border-[3px] border-[#2a2a2a] bg-[#0f0f0f] px-2 py-3">
+              <dt class="text-[10px] uppercase tracking-[0.15em] text-[#e5e5e5]/60">First try</dt>
+              <dd class="mt-1 text-xl font-black text-[#4ade80]">{{ r.score }}/{{ r.totalStages }}</dd>
+            </div>
+            <div class="border-[3px] border-[#2a2a2a] bg-[#0f0f0f] px-2 py-3">
+              <dt class="text-[10px] uppercase tracking-[0.15em] text-[#e5e5e5]/60">Retries</dt>
+              <dd class="mt-1 text-xl font-black text-[#e5e5e5]">{{ r.failedAttempts }}</dd>
+            </div>
+            <div class="border-[3px] border-[#2a2a2a] bg-[#0f0f0f] px-2 py-3">
+              <dt class="text-[10px] uppercase tracking-[0.15em] text-[#e5e5e5]/60">Time</dt>
+              <dd class="mt-1 text-xl font-black text-[#e5e5e5]">{{ duration() }}</dd>
+            </div>
+          </dl>
+
+          <div class="w-full overflow-x-auto">
+            <table class="w-full text-left text-[12px] text-[#e5e5e5] border-collapse">
+              <caption class="sr-only">Result of each stage</caption>
+              <thead>
+                <tr class="text-[10px] uppercase tracking-[0.15em] text-[#e5e5e5]/60">
+                  <th scope="col" class="py-2 pr-2 font-normal">Stage</th>
+                  <th scope="col" class="py-2 pr-2 font-normal">Challenge</th>
+                  <th scope="col" class="py-2 pr-2 font-normal">Outcome</th>
+                  <th scope="col" class="py-2 font-normal"><span class="sr-only">Review</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (s of r.stages; track s.stage) {
+                  <tr class="border-t-[3px] border-[#2a2a2a]">
+                    <th scope="row" class="py-2 pr-2 font-bold">{{ s.stage }}</th>
+                    <td class="py-2 pr-2">{{ labels[s.type] }}</td>
+                    <td class="py-2 pr-2" [class]="s.solvedFirstTry ? 'text-[#4ade80]' : 'text-[#ff3b30]'">
+                      {{ s.solvedFirstTry ? 'First try' : s.attempts + (s.attempts === 1 ? ' retry' : ' retries') }}
+                    </td>
+                    <td class="py-2 text-right">
+                      <a [routerLink]="['/captcha', s.stage]"
+                         [attr.aria-label]="'Review stage ' + s.stage"
+                         class="underline underline-offset-4 hover:text-[#4ade80]">Review</a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p role="status" class="text-[12px] text-[#e5e5e5]/70">Loading results…</p>
+        }
+
+        <div class="w-full border-t-[3px] border-dashed border-[#e5e5e5]/20"></div>
+
+        <button
+          type="button"
+          (click)="restart()"
+          [disabled]="restarting()"
+          class="press-btn w-full py-3.5 text-sm font-bold tracking-[0.15em] uppercase
+                 bg-[#0f0f0f] text-[#e5e5e5]
+                 border-[3px] border-[#2a2a2a]
+                 shadow-[5px_5px_0_#4ade80]
+                 disabled:opacity-40 disabled:cursor-not-allowed">
+          {{ restarting() ? 'RESETTING…' : 'RESTART CHALLENGE' }}
+        </button>
+
+        @if (error()) {
+          <p role="alert" class="text-[12px] text-[#ff3b30] font-bold tracking-wide">[ERR] {{ error() }}</p>
+        }
+      </div>
+
+      <div class="border-t-[3px] border-[#2a2a2a] px-4 py-1.5 flex justify-between text-[10px] text-[#e5e5e5]/60 tracking-[0.15em] uppercase">
+        <span>Angul-It Terminal</span>
+        <span>Session complete</span>
+      </div>
+    </div>
+
+    <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-[#1f1f1f]"></div>
+    <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-[#1f1f1f]"></div>
+  </div>
+</main>

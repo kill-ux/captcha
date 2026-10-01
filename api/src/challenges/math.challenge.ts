@@ -41,7 +41,12 @@ export const mathChallenge: ChallengeGenerator = {
         }
     },
 
-    verify(answer: string, challenge): boolean {
+    verify(answer, challenge): boolean {
+        if (typeof answer !== "string") return false
         return verifyHash(answer.trim(), challenge.answerHash)
+    },
+
+    normalize(answer): string {
+        return typeof answer === "string" ? answer.trim() : ""
     }
 }

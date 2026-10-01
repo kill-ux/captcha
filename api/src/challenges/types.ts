@@ -1,4 +1,4 @@
-import type { CaptchaChallenge, ChallengeType, ImageItem } from "../types/types"
+import type { Answer, CaptchaChallenge, ChallengeType, ImageItem } from "../types/types"
 
 export type GeneratedChallenge = {
     images: ImageItem[]
@@ -9,5 +9,6 @@ export type GeneratedChallenge = {
 export interface ChallengeGenerator {
     type: ChallengeType
     generate(): Promise<GeneratedChallenge>
-    verify(answer: string | string[], challenge: CaptchaChallenge): boolean
+    verify(answer: Answer, challenge: CaptchaChallenge): boolean
+    normalize(answer: Answer): Answer
 }
